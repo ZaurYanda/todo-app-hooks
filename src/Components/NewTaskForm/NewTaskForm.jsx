@@ -1,17 +1,12 @@
 import React from 'react'
 import './NewTaskForm.css'
 import PropTypes from 'prop-types'
+
 class NewTaskForm extends React.Component {
-  // constructor() {
-  //   super();
-  //   this.state = {
-  //     inputValue: '',
-
-  //   }
-  // }
-
   state = {
     value: '',
+    minutes: '',
+    seconds: '',
   }
 
   onLabelChange = (e) => {
@@ -20,27 +15,56 @@ class NewTaskForm extends React.Component {
     })
   }
 
+  onMinutesChange = (e) => {
+    this.setState({ minutes: e.target.value })
+  }
+
+  onSecondsChange = (e) => {
+    this.setState({ seconds: e.target.value })
+  }
+
   onSubmit = (e) => {
     e.preventDefault()
-    const emptySpace = this.state.value.trim()
+    const { value, minutes, seconds } = this.state
+    const emptySpace = value.trim()
     if (!emptySpace) return
-    this.props.addTask(this.state.value)
+
+    const totalSeconds = parseInt(minutes || '0', 10) * 60 + parseInt(seconds || '0', 10)
+
+    // console.log('Submitting task:', value, 'Time:', totalSeconds)
+
+    this.props.addTask(value, totalSeconds)
+
     this.setState({
       value: '',
+      minutes: '',
+      seconds: '',
     })
   }
 
   render() {
     return (
-      <form className="header" onSubmit={this.onSubmit}>
-        <h1>todos</h1>
+      <form className="new-todo-form" onSubmit={this.onSubmit}>
         <input
           className="new-todo"
-          placeholder="What needs to be done?"
+          placeholder="Task"
           autoFocus
-          onChange={this.onLabelChange}
           value={this.state.value}
+          onChange={this.onLabelChange}
         />
+        <input
+          className="new-todo-form__timer"
+          placeholder="Min"
+          value={this.state.minutes}
+          onChange={this.onMinutesChange}
+        />
+        <input
+          className="new-todo-form__timer"
+          placeholder="Sec"
+          value={this.state.seconds}
+          onChange={this.onSecondsChange}
+        />
+        <button type="submit"></button>
       </form>
     )
   }

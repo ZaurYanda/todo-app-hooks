@@ -10,6 +10,7 @@ class App extends React.Component {
   constructor(props) {
     super(props)
     this.maxId = 100
+    this.timerIds = {}
   }
 
   state = {
@@ -18,9 +19,54 @@ class App extends React.Component {
   }
 
   toggleTask = (id) => {
-    this.setState(({ tasks }) => ({
-      tasks: tasks.map((task) => (task.id === id ? { ...task, completed: !task.completed } : task)),
-    }))
+    this.setState(({ tasks }) => {
+      const updatedTasks = tasks.map((task) => {
+        if (task.id === id) {
+          const isNowCompleted = !task.completed
+
+          // Если задача становится завершённой — остановить таймер
+          if (isNowCompleted && this.timerIds[id]) {
+            clearInterval(this.timerIds[id])
+            delete this.timerIds[id]
+          }
+
+          // Если задача снова активна — запустить таймер
+          if (!isNowCompleted && task.timeSpent > 0) {
+            // Защита от дубликатов интервала
+            if (this.timerIds[id]) {
+              clearInterval(this.timerIds[id])
+            }
+
+            this.timerIds[id] = setInterval(() => {
+              this.setState(({ tasks }) => ({
+                tasks: tasks.map((t) => {
+                  if (t.id === id && t.isTimerRunning) {
+                    const newTime = t.timeSpent - 1
+                    if (newTime <= 0) {
+                      clearInterval(this.timerIds[id])
+                      delete this.timerIds[id]
+                      return { ...t, timeSpent: 0, isTimerRunning: false }
+                    }
+                    return { ...t, timeSpent: newTime }
+                  }
+                  return t
+                }),
+              }))
+            }, 1000)
+          }
+
+          return {
+            ...task,
+            completed: isNowCompleted,
+            isTimerRunning: !isNowCompleted && task.timeSpent > 0,
+          }
+        }
+
+        return task
+      })
+
+      return { tasks: updatedTasks }
+    })
   }
 
   deleteTask = (id) => {
@@ -28,12 +74,14 @@ class App extends React.Component {
       tasks: tasks.filter((task) => task.id !== id),
     }))
   }
-  addTask = (text) => {
+  addTask = (text, initialTime) => {
     const newItem = {
       title: text,
       completed: false,
       id: this.maxId++,
       created: new Date().toISOString(),
+      timeSpent: initialTime,
+      isTimerRunning: false,
     }
 
     this.setState(({ tasks }) => {
@@ -67,6 +115,52 @@ class App extends React.Component {
     }))
   }
 
+  startPauseTimer = (id) => {
+    const task = this.state.tasks.find((t) => t.id === id)
+
+    if (!task) return
+
+    if (task.isTimerRunning) {
+      // Останавливаем таймер
+      clearInterval(this.timerIds[id])
+      delete this.timerIds[id]
+
+      this.setState(({ tasks }) => ({
+        tasks: tasks.map((t) => (t.id === id ? { ...t, isTimerRunning: false } : t)),
+      }))
+    } else {
+      // Ставим таймер
+      this.timerIds[id] = setInterval(() => {
+        this.setState(({ tasks }) => ({
+          tasks: tasks.map((t) => {
+            if (t.id === id) {
+              const newTime = t.timeSpent - 1
+              if (newTime <= 0) {
+                clearInterval(this.timerIds[id])
+                delete this.timerIds[id]
+                return {
+                  ...t,
+                  timeSpent: 0,
+                  isTimerRunning: false,
+                }
+              }
+              return {
+                ...t,
+                timeSpent: newTime,
+              }
+            }
+            return t
+          }),
+        }))
+      }, 1000)
+
+      // Обновляем isTimerRunning после запуска таймера
+      this.setState(({ tasks }) => ({
+        tasks: tasks.map((t) => (t.id === id ? { ...t, isTimerRunning: true } : t)),
+      }))
+    }
+  }
+
   render() {
     const completedCount = this.state.tasks.filter((el) => !el.completed).length
 
@@ -78,6 +172,7 @@ class App extends React.Component {
             tasks={this.filter(this.state.tasks, this.state.filter)}
             toggleTask={this.toggleTask}
             deleteTask={this.deleteTask}
+            startPauseTimer={this.startPauseTimer}
           />
         </section>
 

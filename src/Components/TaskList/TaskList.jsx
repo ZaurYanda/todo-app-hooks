@@ -7,7 +7,7 @@ import './TaskList.css'
 
 class TaskList extends React.Component {
   render() {
-    const { tasks, toggleTask, deleteTask } = this.props
+    const { tasks, toggleTask, deleteTask, startPauseTimer } = this.props
     return (
       <ul className="todo-list">
         {tasks.map((task) => (
@@ -18,6 +18,9 @@ class TaskList extends React.Component {
             deleteTask={() => deleteTask(task.id)}
             title={task.title}
             created={task.created}
+            timeSpent={task.timeSpent}
+            isTimerRunning={task.isTimerRunning}
+            startPauseTimer={() => startPauseTimer(task.id)} // ← обязательно!
           />
         ))}
       </ul>
@@ -28,6 +31,7 @@ class TaskList extends React.Component {
 TaskList.defaultProps = {
   toggleTask: () => {},
   deleteTask: () => {},
+  startPauseTimer: () => {},
 }
 
 TaskList.propTypes = {
@@ -36,11 +40,14 @@ TaskList.propTypes = {
       id: PropTypes.number.isRequired,
       title: PropTypes.string.isRequired,
       completed: PropTypes.bool.isRequired,
-      created: PropTypes.instanceOf(Date),
+      created: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+      timeSpent: PropTypes.number.isRequired,
+      isTimerRunning: PropTypes.bool.isRequired,
     })
   ).isRequired,
   toggleTask: PropTypes.func.isRequired,
   deleteTask: PropTypes.func.isRequired,
+  startPauseTimer: PropTypes.func.isRequired,
 }
 
 export default TaskList
