@@ -24,15 +24,12 @@ class App extends React.Component {
         if (task.id === id) {
           const isNowCompleted = !task.completed
 
-          // Если задача становится завершённой — остановить таймер
           if (isNowCompleted && this.timerIds[id]) {
             clearInterval(this.timerIds[id])
             delete this.timerIds[id]
           }
 
-          // Если задача снова активна — запустить таймер
           if (!isNowCompleted && task.timeSpent > 0) {
-            // Защита от дубликатов интервала
             if (this.timerIds[id]) {
               clearInterval(this.timerIds[id])
             }
@@ -121,7 +118,6 @@ class App extends React.Component {
     if (!task) return
 
     if (task.isTimerRunning) {
-      // Останавливаем таймер
       clearInterval(this.timerIds[id])
       delete this.timerIds[id]
 
@@ -129,7 +125,6 @@ class App extends React.Component {
         tasks: tasks.map((t) => (t.id === id ? { ...t, isTimerRunning: false } : t)),
       }))
     } else {
-      // Ставим таймер
       this.timerIds[id] = setInterval(() => {
         this.setState(({ tasks }) => ({
           tasks: tasks.map((t) => {
@@ -154,7 +149,6 @@ class App extends React.Component {
         }))
       }, 1000)
 
-      // Обновляем isTimerRunning после запуска таймера
       this.setState(({ tasks }) => ({
         tasks: tasks.map((t) => (t.id === id ? { ...t, isTimerRunning: true } : t)),
       }))
