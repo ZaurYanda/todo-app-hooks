@@ -110,7 +110,10 @@
     color: gray;
 } */
 
-.timer-text {
+.task-content {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 85px 15px 60px;
     font-size: 13px;
-    color: gray;
 }

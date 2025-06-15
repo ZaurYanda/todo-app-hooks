@@ -1,5 +1,7 @@
+// NewTaskForm.jsx
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+
 import './NewTaskForm.css'
 
 function NewTaskForm({ addTask }) {
@@ -9,11 +11,11 @@ function NewTaskForm({ addTask }) {
 
   const onSubmit = (e) => {
     e.preventDefault()
-    const taskText = value.trim()
-    if (!taskText) return
+    const trimmed = value.trim()
+    if (!trimmed) return
 
     const totalSeconds = parseInt(minutes || '0', 10) * 60 + parseInt(seconds || '0', 10)
-    addTask(taskText, totalSeconds)
+    addTask(trimmed, totalSeconds)
 
     setValue('')
     setMinutes('')
@@ -48,6 +50,10 @@ function NewTaskForm({ addTask }) {
 
 NewTaskForm.propTypes = {
   addTask: PropTypes.func.isRequired,
+}
+
+NewTaskForm.defaultProps = {
+  addTask: () => {},
 }
 
 export default NewTaskForm

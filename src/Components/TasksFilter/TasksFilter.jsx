@@ -1,3 +1,4 @@
+// TasksFilter.jsx
 import React from 'react'
 import PropTypes from 'prop-types'
 
@@ -11,12 +12,12 @@ function TasksFilter({ filter, onFilterSelect }) {
   return (
     <ul className="filters">
       {buttons.map(({ name, label }) => {
-        const active = filter === name
-        const clazz = active ? 'selected' : ''
+        const isActive = filter === name
+        const className = isActive ? 'selected' : ''
 
         return (
           <li key={name}>
-            <button type="button" className={`btn ${clazz}`} onClick={() => onFilterSelect(name)}>
+            <button type="button" className={`btn ${className}`} onClick={() => onFilterSelect(name)}>
               {label}
             </button>
           </li>
@@ -26,14 +27,14 @@ function TasksFilter({ filter, onFilterSelect }) {
   )
 }
 
+TasksFilter.propTypes = {
+  filter: PropTypes.string,
+  onFilterSelect: PropTypes.func,
+}
+
 TasksFilter.defaultProps = {
   filter: 'all',
   onFilterSelect: () => {},
-}
-
-TasksFilter.propTypes = {
-  onFilterSelect: PropTypes.func,
-  filter: PropTypes.string,
 }
 
 export default TasksFilter

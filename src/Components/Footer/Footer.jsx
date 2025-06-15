@@ -1,3 +1,4 @@
+// Footer.jsx
 import React from 'react'
 import PropTypes from 'prop-types'
 
@@ -9,7 +10,9 @@ function Footer({ count, filter, onFilterSelect, clearCompleted }) {
       <span className="todo-count">
         {count} {count === 1 ? 'item' : 'items'} left
       </span>
+
       <TasksFilter filter={filter} onFilterSelect={onFilterSelect} />
+
       <button className="clear-completed" onClick={clearCompleted}>
         Clear completed
       </button>
@@ -17,17 +20,18 @@ function Footer({ count, filter, onFilterSelect, clearCompleted }) {
   )
 }
 
-Footer.defaultProps = {
-  count: 0,
-  filter: 'all',
-  onFilterSelect: () => {},
-}
-
 Footer.propTypes = {
   count: PropTypes.number,
   filter: PropTypes.string,
   onFilterSelect: PropTypes.func,
   clearCompleted: PropTypes.func,
+}
+
+Footer.defaultProps = {
+  count: 0,
+  filter: 'all',
+  onFilterSelect: () => {},
+  clearCompleted: () => {},
 }
 
 export default Footer
